@@ -19,16 +19,21 @@
       }
     ],
     "paths": {
-      " @/*": ["./src/*"]
+      "@/*": ["./apps/web/src/*"],
+      "@simpra/shared/*": ["./packages/shared/*"],
+      "@simpra/domain/*": ["./packages/domain/*"],
+      "@simpra/application/*": ["./packages/application/*"],
+      "@simpra/infrastructure/*": ["./packages/infrastructure/*"]
     }
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "apps/web/next-env.d.ts",
+    "apps/web/**/*.ts",
+    "apps/web/**/*.tsx",
+    "apps/api/src/**/*.ts",
+    "packages/**/*.ts",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

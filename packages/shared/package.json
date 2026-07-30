@@ -1,0 +1,14 @@
+{
+  "name": "@simpra/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "exports": {
+    "./validation": "./validation/index.ts",
+    "./types": "./types/index.ts"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}
