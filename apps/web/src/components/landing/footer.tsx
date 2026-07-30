@@ -4,9 +4,8 @@ const COLUMNS = [
   {
     title: "Product",
     links: [
-      { label: "Features", href: "#features" },
-      { label: "Pricing", href: "#pricing" },
-      { label: "Integrations", href: "#integrations" },
+      { label: "Features", href: "/features" },
+      { label: "Integrations", href: "/integrations" },
       { label: "Dashboard", href: "/dashboard" },
     ],
   },
@@ -23,7 +22,7 @@ const COLUMNS = [
     title: "Company",
     links: [
       { label: "About", href: "/about" },
-      { label: "Contact", href: "#contact" },
+      { label: "Contact", href: "/contact" },
       { label: "Careers", href: "/careers" },
       { label: "Press", href: "/press" },
     ],

@@ -6,11 +6,11 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const LINKS = [
-  { label: "Features", href: "#features" },
-  { label: "Solutions", href: "#workflow" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Home", href: "/" },
+  { label: "Features", href: "/features" },
+  { label: "Integrations", href: "/integrations" },
   { label: "Documentation", href: "https://docs.simpra.io" },
-  { label: "Contact", href: "#contact" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export function Navigation() {
@@ -37,11 +37,6 @@ export function Navigation() {
           ))}
         </nav>
         <div className="hidden items-center gap-3 md:flex">
-          <Link href="/login">
-            <Button variant="ghost" size="sm">
-              Log In
-            </Button>
-          </Link>
           <Link href="/register">
             <Button size="sm">Get Started</Button>
           </Link>
@@ -81,15 +76,9 @@ export function Navigation() {
             ))}
             <div className="mt-4 flex flex-col gap-2 border-t pt-4">
               <Link
-                href="/login"
-                className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-                onClick={() => setMobileOpen(false)}
-              >
-                Log In
-              </Link>
-              <Link
                 href="/register"
                 className="rounded-md bg-primary px-3 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                onClick={() => setMobileOpen(false)}
               >
                 Get Started
               </Link>
