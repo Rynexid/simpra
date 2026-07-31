@@ -1,7 +1,9 @@
 {
   "functions": {
     "api/[[route]].ts": {
-      "runtime": "@vercel/edge@1.1.0"
+      "runtime": "nodejs20.x",
+      "memory": 1024,
+      "maxDuration": 10
     }
   }
 }
