@@ -10,7 +10,7 @@ const LINKS = [
   { label: "Home", href: "/" },
   { label: "Features", href: "/features" },
   { label: "Integrations", href: "/integrations" },
-  { label: "Documentation", href: "https://docs.simpra.io" },
+  { label: "Documentation", href: "https://docs-simpra.vercel.app" },
   { label: "Contact", href: "/contact" },
 ];
 

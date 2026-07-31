@@ -13,7 +13,7 @@ const COLUMNS = [
   {
     title: "Resources",
     links: [
-      { label: "Documentation", href: "https://docs.simpra.io" },
+      { label: "Documentation", href: "https://docs-simpra.vercel.app" },
       { label: "API Reference", href: "/api/v1" },
       { label: "Blog", href: "https://blog.simpra.io" },
       { label: "Changelog", href: "https://changelog.simpra.io" },
