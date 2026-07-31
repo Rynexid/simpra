@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { swaggerUI } from "@hono/swagger-ui";
 import { auth } from "./auth";
 
 const app = new OpenAPIHono().basePath("/api/v1");
@@ -36,6 +37,12 @@ app.openapi(healthRoute, async (c) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+app.get("/openapi.json", async (c) => {
+  return c.json(await app.getOpenAPIDocument());
+});
+
+app.get("/docs", swaggerUI({ url: "/api/v1/openapi.json" }));
 
 app.all("/auth/*", async (c) => {
   const url = new URL(c.req.url);

@@ -24,6 +24,7 @@
       "dependencies": {
         "@better-auth/infra": "^0.3.7",
         "@hono/node-server": "^2.0.12",
+        "@hono/swagger-ui": "^0.4.0",
         "@hono/zod-openapi": "^1.5.1",
         "better-auth": "^1.6.25",
         "drizzle-orm": "^0.45.2",
@@ -394,6 +395,8 @@
     "@floating-ui/utils": ["@floating-ui/utils@0.2.12", "", {}, "sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww=="],
 
     "@hono/node-server": ["@hono/node-server@2.0.12", "", { "peerDependencies": { "hono": "^4" } }, "sha512-eWpQYr67tqJLeaSUl0Q+TquuYfUdTibpOJlUMV2FfUP7+KqCC5TufnwnlXL6mobZBJbGAYRd7ZvEBDCbLInjhg=="],
+
+    "@hono/swagger-ui": ["@hono/swagger-ui@0.4.1", "", { "peerDependencies": { "hono": "*" } }, "sha512-kPaJatHffeYQ3yVkHo878hCqwfapqx54FczJVJ+eRWt8J4biyVVMIdCAJb6MyA8bcnHUoTmUpPc7OJAV1VTg2g=="],
 
     "@hono/zod-openapi": ["@hono/zod-openapi@1.5.1", "", { "dependencies": { "@asteasolutions/zod-to-openapi": "^8.5.0", "@hono/zod-validator": "^0.9.0", "openapi3-ts": "^4.5.0" }, "peerDependencies": { "hono": ">=4.10.0", "zod": "^4.0.0" } }, "sha512-ZaDdEIkn6PEGjIYHXJeyByg6yhvLzI+UXn968pWtahpwcQ6HMjQYXI3zNffTl0Wl9QZ79nUnGqiN1erEIu23fA=="],
 
