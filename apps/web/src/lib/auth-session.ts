@@ -5,7 +5,7 @@ export async function getSession() {
     const cookieStore = await cookies();
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_AUTH_URL ?? "http://localhost:3001"}/api/v1/auth/get-session`,
+      `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/auth/get-session`,
       {
         headers: {
           cookie: cookieStore.toString(),

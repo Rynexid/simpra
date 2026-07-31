@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { getSession } from "@/lib/auth-session";
 import { hasOrganization } from "@/lib/tenant";
+import { auth } from "@/lib/auth";
 import { OnboardingForm } from "./onboarding-form";
 
 function slugify(name: string): string {
@@ -46,65 +47,35 @@ export default async function OnboardingPage() {
 
   async function handleCreateOrg(formData: FormData) {
     "use server";
-    const cookieStore = await headers();
-    const base = process.env.NEXT_PUBLIC_AUTH_URL ?? "http://localhost:3001";
-
+    const headerStore = await headers();
     const companyName = String(formData.get("companyName") ?? "").trim();
     if (!companyName) {
       throw new Error("Company name is required");
     }
 
-    const orgPayload = {
-      name: companyName,
-      slug: slugify(companyName),
-      teamName: companyName,
-      defaultTimezone: String(formData.get("timezone") ?? "").trim() || "Asia/Jakarta",
-      currency: String(formData.get("currency") ?? "").trim() || "IDR",
-      industry: String(formData.get("industry") ?? "").trim() || undefined,
-      companySize: String(formData.get("companySize") ?? "").trim() || undefined,
-    };
-
-    const orgRes = await fetch(`${base}/api/v1/auth/create-organization`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        cookie: cookieStore.toString(),
+    const org = await auth.api.createOrganization({
+      headers: headerStore,
+      body: {
+        name: companyName,
+        slug: slugify(companyName),
+        teamName: companyName,
+        defaultTimezone: String(formData.get("timezone") ?? "").trim() || "Asia/Jakarta",
+        currency: String(formData.get("currency") ?? "").trim() || "IDR",
+        industry: String(formData.get("industry") ?? "").trim() || undefined,
+        companySize: String(formData.get("companySize") ?? "").trim() || undefined,
       },
-      body: JSON.stringify(orgPayload),
     });
 
-    if (!orgRes.ok) {
-      const err = await orgRes.json().catch(() => ({}));
-      throw new Error(err.message ?? "Failed to create organization");
-    }
-
-    const org = await orgRes.json();
-
-    await fetch(`${base}/api/v1/auth/set-active-organization`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        cookie: cookieStore.toString(),
-      },
-      body: JSON.stringify({ organizationId: org.id }),
+    await auth.api.setActiveOrganization({
+      headers: headerStore,
+      body: { organizationId: org.id },
     });
 
-    const invites = collectInvites(formData);
-    for (const invite of invites) {
-      if (invite.email.trim()) {
-        await fetch(`${base}/api/v1/auth/create-invitation`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            cookie: cookieStore.toString(),
-          },
-          body: JSON.stringify({
-            organizationId: org.id,
-            email: invite.email,
-            role: invite.role,
-          }),
-        });
-      }
+    for (const invite of collectInvites(formData)) {
+      await auth.api.createInvitation({
+        headers: headerStore,
+        body: { organizationId: org.id, email: invite.email, role: invite.role },
+      });
     }
   }
 
