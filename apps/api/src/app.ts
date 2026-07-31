@@ -39,7 +39,7 @@ app.openapi(healthRoute, async (c) => {
 });
 
 app.get("/openapi.json", async (c) => {
-  return c.json(await app.getOpenAPIDocument());
+  return c.json(await (app as any).getOpenAPIDocument());
 });
 
 app.get("/docs", swaggerUI({ url: "/api/v1/openapi.json" }));
@@ -50,13 +50,16 @@ app.all("/auth/*", async (c) => {
 
   const request = new Request(url.toString(), {
     method: c.req.method,
-    headers: c.req.raw.headers,
-    body: c.req.raw.body,
+    headers: c.req.headers(),
+    body: await c.req.text(),
     redirect: "manual",
   });
 
-  const response = (await auth.handler(request)) as Response;
-  return response;
+  const response = await auth.handler(request);
+  return new Response(response.body, {
+    status: response.status,
+    headers: Object.fromEntries(response.headers.entries()),
+  });
 });
 
 export default app;
