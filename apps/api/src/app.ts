@@ -47,9 +47,14 @@ app.get("/docs", swaggerUI({ url: "/api/v1/openapi.json" }));
 app.all("/auth/*", async (c) => {
   const url = new URL(c.req.url);
   url.pathname = url.pathname.replace(/^\/api\/v1\/auth/, "");
-  const request = new Request(url.toString(), c.req.raw as Request);
-  const response = await auth.handler(request);
-  return response;
+  const req = new Request(url.toString(), {
+    method: c.req.method,
+    headers: c.req.headers,
+    body: c.req.body,
+    redirect: "manual",
+  });
+  const res = await auth.handler(req);
+  return res;
 });
 
 export default app;
