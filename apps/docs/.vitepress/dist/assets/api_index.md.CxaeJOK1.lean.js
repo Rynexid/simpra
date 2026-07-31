@@ -1,0 +1,1 @@
+import{_ as e,o as t,c as i,a0 as s}from"./chunks/framework.Bmhw_dvp.js";const u=JSON.parse('{"title":"API","description":"","frontmatter":{},"headers":[],"relativePath":"api/index.md","filePath":"api/index.md"}'),n={name:"api/index.md"};function o(r,a,p,l,c,d){return t(),i("div",null,[...a[0]||(a[0]=[s("",7)])])}const _=e(n,[["render",o]]);export{u as __pageData,_ as default};
