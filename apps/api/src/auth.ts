@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+// @ts-ignore
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
