@@ -17,7 +17,8 @@ simpra/
 │   ├── domain/       Entities, value objects
 │   ├── application/  Use cases, ports (repository interfaces)
 │   ├── infrastructure DB (Drizzle), auth (Better Auth), R2, events, observability
-│   └── shared/       Zod schemas, shared TS types
+│   ├── shared/       Zod schemas, shared TS types
+│   └── ui/           shadcn/ui components (base-ui), hooks, lib/utils
 ├── docs/       11 tracked docs (01–11)
 └── infra/      Docker, Coolify config
 ```
@@ -44,8 +45,9 @@ bun db:studio   # drizzle-kit studio
 - Root layout: `apps/web/src/app/layout.tsx` (sidebar + topbar + cmdk)
 - Routes are in **route groups**: `(dashboard)` and `(marketing)`. Group names are not part of the URL.
 - Better Auth server: `apps/web/src/lib/auth.ts`; API route handler: `apps/web/src/app/api/auth/[...all]/route.ts`
-- UI lib: `apps/web/src/components/ui/` (shadcn, base-nova style)
-- Shared utility: `apps/web/src/lib/utils.ts` — `cn()` via `clsx` + `tailwind-merge`
+- UI lib: `packages/ui/src/components/` (shadcn, base-nova style) — imported from web as `@simpra/ui/components/*`; package-local aliases are `#components/*`, `#lib/utils`, `#hooks/*`
+- Theme: `apps/web/src/app/globals.css` (Tailwind v4 + @theme tokens); `apps/web/components.json` target points at `src/app/globals.css`. Tailwind also scans `@source "../../../../packages/ui/src"` so ui component classes are included.
+- Shared utility: `packages/ui/src/lib/utils.ts` — `cn()` via `clsx` + `tailwind-merge`, imported as `@simpra/ui/lib/utils`
 
 ### API (`apps/api/`)
 - Entry: `apps/api/src/index.ts` → `apps/api/src/app.ts`
@@ -64,7 +66,7 @@ bun db:studio   # drizzle-kit studio
 | `apps/web/tsconfig.json` | `./src/*` | `../../packages/*` |
 | root `tsconfig.json` | `./apps/web/src/*` | `./packages/*` |
 
-Next.js resolves via `apps/web/tsconfig.json`. **Do not rely on root `tsconfig.json` `@/*` for web imports.** Monorepo packages (`@simpra/*`) are relative from each app's tsconfig.
+Next.js resolves via `apps/web/tsconfig.json`. **Do not rely on root `tsconfig.json` `@/*` for web imports.** Monorepo packages (`@simpra/*`) are relative from each app's tsconfig. `@simpra/ui` has no tsconfig path entry; it resolves via `apps/web/node_modules/@simpra/ui` symlink + `packages/ui/package.json` `exports`.
 
 ## Key Gotchas
 
@@ -75,7 +77,9 @@ Next.js resolves via `apps/web/tsconfig.json`. **Do not rely on root `tsconfig.j
 - **Tests need PostgreSQL** — CI test job starts an ephemeral `postgres:17-alpine` service with `DATABASE_URL`. Local tests need the same.
 - **Conflicting `@/*` definitions** — root tsconfig vs web tsconfig differ. Use `@/*` only inside `apps/web/`; never mix root aliases into web imports.
 - **shadcn/ui aliases must not have leading space** — `components.json` aliases and generated components use `"@/"` exactly. A leading space causes build-time "Module not found".
-- **Partial Radix / base-ui migration** — many `@radix-ui/*` primitives remain in `package.json` and the codebase alongside `@base-ui/react`. Do not assume all interactive components use base-ui.
+- **UI components live in `packages/ui`** — shadcn monorepo layout: web's `components.json` routes `ui` → `@simpra/ui/components`; `packages/ui/components.json` uses `#` package-local aliases. `@radix-ui/*` is fully removed from deps — base-ui only. `cmdk` remains (used by `command.tsx`; brings transitive radix deps).
+- **`packages/ui` owns its JS deps** — react, @base-ui/react,clsx, cva, lucide-react, next-themes, sonner, tailwind-merge are declared in `packages/ui/package.json` so TS/JS resolves from that package. CSS deps stay in `apps/web/package.json` (`tailwindcss`, `tw-animate-css`, `shadcn`) because `globals.css` lives in `apps/web/src/app/`.
+- **No turbopack.root needed** — `globals.css` lives inside `apps/web` (project root), so Tailwind v4 + `@source "../../../../packages/ui/src"` works without expanding Turbopack root to the whole monorepo.
 - **`apps/web/next-env.d.ts`** is auto-generated — do not edit.
 - **ESLint flat config** — `apps/web/eslint.config.mjs` uses `eslint-config-next/core-web-vitals` + `typescript`. Covers only `apps/web/src/`. API is TypeScript-strict but not linted by `eslint-config-next`.
 - **`apps/web/package.json`** has `ignoreScripts: ["sharp", "unrs-resolver"]` and `trustedDependencies: ["sharp", "unrs-resolver"]`.

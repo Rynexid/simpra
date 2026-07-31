@@ -7,8 +7,10 @@ export interface InventoryItem {
   unitOfMeasure: string;
   barcode: string | null;
   reorderThreshold: number | null;
+  currentStock: number;
   isArchived: boolean;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateInventoryItemInput {

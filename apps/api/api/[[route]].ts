@@ -1,8 +1,9 @@
-import { handle } from "hono/vercel";
-import app from "../src/app";
+import { app } from "../src/app";
 
 export const config = {
-  runtime: "edge",
+  runtime: "nodejs20.x",
 };
 
-export default handle(app);
+export default async (req: Request) => {
+  return app.fetch(req);
+};

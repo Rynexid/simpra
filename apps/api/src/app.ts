@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { auth } from "./auth";
 
 const app = new OpenAPIHono().basePath("/api/v1");
 
@@ -33,6 +34,22 @@ app.openapi(healthRoute, async (c) => {
   return c.json({
     status: "ok" as const,
     timestamp: new Date().toISOString(),
+  });
+});
+
+app.all("/auth/*", async (c) => {
+  const url = new URL(c.req.url);
+  url.pathname = url.pathname.replace(/^\/api\/v1\/auth/, "");
+  const proxied = new Request(url.toString(), {
+    method: c.req.method,
+    headers: c.req.headers,
+    body: c.req.body,
+    redirect: "manual",
+  });
+  const response = await auth.handler(proxied);
+  return new Response(response.body, {
+    status: response.status,
+    headers: Object.fromEntries(response.headers.entries()),
   });
 });
 

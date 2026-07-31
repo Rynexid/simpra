@@ -5,15 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1785425186864,
-      "tag": "0000_aromatic_the_hunter",
+      "when": 1785467653283,
+      "tag": "0000_init",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1785443726595,
-      "tag": "0001_deep_lightspeed",
+      "when": 1785499259062,
+      "tag": "0001_organization_onboarding",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785501741740,
+      "tag": "0002_organization_currency",
       "breakpoints": true
     }
   ]

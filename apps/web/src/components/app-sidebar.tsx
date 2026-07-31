@@ -11,7 +11,7 @@ import {
   SidebarMenuButton,
   SidebarGroup,
   SidebarGroupLabel,
-} from "@/components/ui/sidebar"
+} from "@simpra/ui/components/sidebar"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
@@ -49,8 +49,9 @@ const navItems = [
 
 export function AppSidebar({
   user,
+  organization,
   ...props
-}: { user: User } & React.ComponentProps<typeof Sidebar>) {
+}: { user: User; organization?: { id: string; name: string } } & React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
 
   return (
@@ -59,7 +60,7 @@ export function AppSidebar({
         <TeamSwitcher
           teams={[
             {
-              name: "Simpra",
+              name: organization?.name ?? "Simpra",
               logo: <GalleryVerticalEndIcon />,
               plan: "Enterprise",
             },

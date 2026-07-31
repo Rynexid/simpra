@@ -1,5 +1,5 @@
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@simpra/ui/components/card";
+import { Badge } from "@simpra/ui/components/badge";
 import {
   PlusIcon,
 } from "lucide-react";

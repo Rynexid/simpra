@@ -3,7 +3,7 @@ import { organizations } from "./organizations";
 
 export const warehouses = pgTable("warehouses", {
   id: uuid("id").primaryKey().defaultRandom(),
-  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 255 }).notNull(),
   code: varchar("code", { length: 50 }).notNull(),
   address: text("address"),

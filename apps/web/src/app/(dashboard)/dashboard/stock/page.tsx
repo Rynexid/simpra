@@ -1,25 +1,16 @@
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { Card } from "@simpra/ui/components/card";
+import { Badge } from "@simpra/ui/components/badge";
+import { Input } from "@simpra/ui/components/input";
 import {
   ArrowRightLeftIcon,
   SearchIcon,
   TrendingUpIcon,
   TrendingDownIcon,
   ArrowRightIcon,
-  PlusIcon,
 } from "lucide-react";
+import { cookies } from "next/headers";
 
-const transactions = [
-  { id: "TXN-001", item: "Widget A-100", type: "stock-in", qty: "+500", warehouse: "Main", performedBy: "Andi R.", date: "Today, 10:32 AM", note: "Supplier restock" },
-  { id: "TXN-002", item: "Bolt M8 x 30", type: "stock-out", qty: "-50", warehouse: "East", performedBy: "Siti N.", date: "Today, 09:15 AM", note: "Production order #PO-042" },
-  { id: "TXN-003", item: "Sensor Kit v2", type: "transfer", qty: "200", warehouse: "Main > West", performedBy: "Budi P.", date: "Yesterday, 04:20 PM", note: "Restock West storage" },
-  { id: "TXN-004", item: "LED Panel 24V", type: "stock-in", qty: "+1,000", warehouse: "West", performedBy: "Rina W.", date: "Yesterday, 02:45 PM", note: "Bulk import shipment" },
-  { id: "TXN-005", item: "Rubber Gasket", type: "adjustment", qty: "+10", warehouse: "Main", performedBy: "Dewi K.", date: "Yesterday, 11:00 AM", note: "Cycle count correction" },
-  { id: "TXN-006", item: "Steel Rod 12mm", type: "stock-out", qty: "-200", warehouse: "Main", performedBy: "Andi R.", date: "2 days ago, 03:30 PM", note: "Construction project" },
-  { id: "TXN-007", item: "Control Board v3", type: "transfer", qty: "50", warehouse: "East > Main", performedBy: "Siti N.", date: "2 days ago, 01:10 PM", note: "Consolidation" },
-  { id: "TXN-008", item: "O-Ring Set", type: "stock-in", qty: "+500", warehouse: "West", performedBy: "Budi P.", date: "3 days ago, 09:00 AM", note: "Monthly restock" },
-];
+const API_BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 const typeConfig = {
   "stock-in": { label: "Stock In", icon: TrendingUpIcon, className: "bg-success/10 text-success" },
@@ -30,7 +21,19 @@ const typeConfig = {
 
 type TransactionType = keyof typeof typeConfig;
 
-export default function StockPage() {
+export default async function StockPage() {
+  const cookieStore = await cookies();
+  const res = await fetch(`${API_BASE}/api/v1/stock-transactions?pageSize=20`, {
+    headers: { cookie: cookieStore.toString() },
+    cache: "no-store",
+  });
+
+  let transactions = [];
+  if (res.ok) {
+    const data = await res.json();
+    transactions = data.data ?? [];
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -40,30 +43,12 @@ export default function StockPage() {
             Record stock movements, transfers, and adjustments.
           </p>
         </div>
-        <button className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/80">
-          <PlusIcon className="size-4" />
-          New Transaction
-        </button>
       </div>
 
       <div className="flex items-center gap-3">
         <div className="relative flex-1">
           <SearchIcon className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Search transactions..." className="pl-8" />
-        </div>
-        <div className="flex gap-1">
-          {["All", "Stock In", "Stock Out", "Transfer", "Adjustment"].map((tab) => (
-            <button
-              key={tab}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                tab === "All"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -73,39 +58,50 @@ export default function StockPage() {
             <thead>
               <tr className="border-b border-border">
                 <th className="px-(--card-spacing) py-2.5 text-left font-medium text-muted-foreground">ID</th>
-                <th className="px-(--card-spacing) py-2.5 text-left font-medium text-muted-foreground">Item</th>
                 <th className="px-(--card-spacing) py-2.5 text-left font-medium text-muted-foreground">Type</th>
                 <th className="px-(--card-spacing) py-2.5 text-right font-medium text-muted-foreground">Qty</th>
                 <th className="px-(--card-spacing) py-2.5 text-left font-medium text-muted-foreground">Warehouse</th>
-                <th className="px-(--card-spacing) py-2.5 text-left font-medium text-muted-foreground">By</th>
-                <th className="px-(--card-spacing) py-2.5 text-left font-medium text-muted-foreground">Date</th>
                 <th className="px-(--card-spacing) py-2.5 text-left font-medium text-muted-foreground">Note</th>
+                <th className="px-(--card-spacing) py-2.5 text-left font-medium text-muted-foreground">Date</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {transactions.map((tx) => {
-                const config = typeConfig[tx.type as TransactionType];
-                const TypeIcon = config.icon;
-                return (
-                  <tr key={tx.id} className="hover:bg-muted/50">
-                    <td className="px-(--card-spacing) py-3 font-mono text-xs">{tx.id}</td>
-                    <td className="px-(--card-spacing) py-3 font-medium">{tx.item}</td>
-                    <td className="px-(--card-spacing) py-3">
-                      <Badge className={config.className} variant="ghost">
-                        <TypeIcon className="size-3" />
-                        {config.label}
-                      </Badge>
-                    </td>
-                    <td className={`px-(--card-spacing) py-3 text-right font-medium tabular-nums ${
-                      tx.type === "stock-in" || tx.type === "adjustment" ? "text-success" : tx.type === "stock-out" ? "text-destructive" : ""
-                    }`}>{tx.qty}</td>
-                    <td className="px-(--card-spacing) py-3 text-muted-foreground">{tx.warehouse}</td>
-                    <td className="px-(--card-spacing) py-3 text-muted-foreground">{tx.performedBy}</td>
-                    <td className="px-(--card-spacing) py-3 text-muted-foreground whitespace-nowrap">{tx.date}</td>
-                    <td className="px-(--card-spacing) py-3 text-muted-foreground max-w-[200px] truncate">{tx.note}</td>
-                  </tr>
-                );
-              })}
+              {transactions.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-(--card-spacing) py-8 text-center text-muted-foreground">
+                    No transactions yet. Create your first stock transaction to get started.
+                  </td>
+                </tr>
+              ) : (
+                transactions.map((tx: {
+                  id: string;
+                  type: string;
+                  quantity: number;
+                  warehouseId: string;
+                  note: string | null;
+                  createdAt: string;
+                }) => {
+                  const config = typeConfig[tx.type as TransactionType] ?? typeConfig.adjustment;
+                  const TypeIcon = config.icon;
+                  return (
+                    <tr key={tx.id} className="hover:bg-muted/50">
+                      <td className="px-(--card-spacing) py-3 font-mono text-xs">{tx.id}</td>
+                      <td className="px-(--card-spacing) py-3">
+                        <Badge className={config.className} variant="ghost">
+                          <TypeIcon className="size-3" />
+                          {config.label}
+                        </Badge>
+                      </td>
+                      <td className={`px-(--card-spacing) py-3 text-right font-medium tabular-nums ${
+                        tx.type === "stock-in" || tx.type === "adjustment" ? "text-success" : tx.type === "stock-out" ? "text-destructive" : ""
+                      }`}>{tx.quantity > 0 ? `+${tx.quantity}` : tx.quantity}</td>
+                      <td className="px-(--card-spacing) py-3 text-muted-foreground">{tx.warehouseId}</td>
+                      <td className="px-(--card-spacing) py-3 text-muted-foreground max-w-[200px] truncate">{tx.note ?? "-"}</td>
+                      <td className="px-(--card-spacing) py-3 text-muted-foreground whitespace-nowrap">{new Date(tx.createdAt).toLocaleString()}</td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

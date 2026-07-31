@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@simpra/ui/components/card";
+import { Badge } from "@simpra/ui/components/badge";
 import {
   FileTextIcon,
   DownloadIcon,
@@ -47,7 +47,7 @@ const recentReports = [
   { name: "Monthly Valuation", date: "Mar 20, 2025", format: "XLSX", status: "generating" as const },
 ];
 
-export default function ReportsPage() {
+export default async function ReportsPage() {
   return (
     <div className="space-y-6">
       <div>

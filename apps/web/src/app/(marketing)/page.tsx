@@ -9,13 +9,42 @@ import {
   Scan,
   CheckCircle2,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@simpra/ui/components/button"
 
 export const metadata = {
   title: "Simpra — Modern Inventory & Warehouse Management",
   description:
     "Simpra is a modern Inventory & Warehouse Management SaaS platform. Manage inventory, warehouses, suppliers, purchasing, stock movement, and reporting from one cloud platform.",
-}
+  keywords: ["inventory management", "warehouse management", "stock tracking", "SME inventory", "warehouse software", "Simpra", "Rynex Studio", "Indonesia inventory software"],
+  authors: [{ name: "Rynex Studio" }],
+  creator: "Rynex Studio",
+  publisher: "Rynex Studio",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://simpra.vercel.app"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: {
+      default: "Simpra — Modern Inventory & Warehouse Platform",
+      template: "%s | Simpra",
+    },
+    description:
+      "Manage inventory, warehouses, suppliers, purchasing, and stock movement from one modern platform.",
+    url: "/",
+    siteName: "Simpra",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: {
+      default: "Simpra — Modern Inventory & Warehouse Platform",
+      template: "%s | Simpra",
+    },
+    description:
+      "Manage inventory, warehouses, suppliers, purchasing, and stock movement from one modern platform.",
+  },
+};
 
 const FEATURES = [
   {

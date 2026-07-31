@@ -5,7 +5,7 @@ import { warehouses } from "./warehouses";
 
 export const stockTransactions = pgTable("stock_transactions", {
   id: uuid("id").primaryKey().defaultRandom(),
-  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   inventoryItemId: uuid("inventory_item_id").notNull().references(() => inventoryItems.id, { onDelete: "cascade" }),
   warehouseId: uuid("warehouse_id").notNull().references(() => warehouses.id, { onDelete: "cascade" }),
   type: varchar("type", { length: 20 }).notNull(),

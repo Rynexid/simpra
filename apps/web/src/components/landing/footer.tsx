@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const COLUMNS = [
   {
@@ -44,11 +45,9 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
           <div className="col-span-2">
-            <Link href="/" className="flex items-center gap-2 font-semibold text-lg">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <span className="text-sm font-bold">S</span>
-              </div>
-              Simpra
+            <Link href="/" className="flex items-center">
+              <Image src="/simpraLogo.webp" alt="Simpra" width={120} height={32} className="h-8 w-auto" />
+              <span className="ml-2 font-semibold text-lg">Simpra</span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground max-w-xs">
               Modern Inventory & Warehouse Management SaaS by Rynex Studio.
@@ -63,7 +62,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      className="text-sm text-muted-foreground transition-colors hover:text-primary"
                     >
                       {link.label}
                     </Link>
@@ -78,9 +77,11 @@ export function Footer() {
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} PT Rynex Studio. All rights reserved.
           </p>
-          <p className="text-xs text-muted-foreground">
-            Built with Next.js, Hono, Bun, and a lot of love.
-          </p>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <Link href="/privacy" className="transition-colors hover:text-primary">Privacy Policy</Link>
+            <Link href="/terms" className="transition-colors hover:text-primary">Terms of Service</Link>
+            <Link href="/cookies" className="transition-colors hover:text-primary">Cookie Policy</Link>
+          </div>
         </div>
       </div>
     </footer>

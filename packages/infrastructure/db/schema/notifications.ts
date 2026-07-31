@@ -4,7 +4,7 @@ import { user } from "./better-auth";
 
 export const notifications = pgTable("notifications", {
   id: uuid("id").primaryKey().defaultRandom(),
-  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   recipientUserId: text("recipient_user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   type: varchar("type", { length: 100 }).notNull(),
   payload: jsonb("payload").notNull(),

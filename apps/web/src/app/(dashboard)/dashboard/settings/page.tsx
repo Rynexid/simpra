@@ -1,9 +1,9 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@simpra/ui/components/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@simpra/ui/components/tabs";
+import { Input } from "@simpra/ui/components/input";
+import { Badge } from "@simpra/ui/components/badge";
 import {
   UserIcon,
   BuildingIcon,

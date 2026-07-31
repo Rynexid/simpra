@@ -1,20 +1,41 @@
-import { pgTable, uuid, varchar, timestamp, jsonb, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index } from "drizzle-orm/pg-core";
+import { user } from "./better-auth";
 import { organizations } from "./organizations";
 
-export const roles = pgTable("roles", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  organizationId: uuid("organization_id").references(() => organizations.id, { onDelete: "cascade" }),
-  name: varchar("name", { length: 100 }).notNull(),
-  permissions: jsonb("permissions").notNull().default([]),
-  isSystemDefault: boolean("is_system_default").notNull().default(false),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+export const member = pgTable(
+  "member",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    role: text("role").notNull().default("member"),
+    createdAt: timestamp("created_at").notNull(),
+  },
+  (table) => [
+    index("member_organization_id_idx").on(table.organizationId),
+    index("member_user_id_idx").on(table.userId),
+  ]
+);
 
-export const userOrgMemberships = pgTable("user_org_memberships", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: varchar("user_id", { length: 255 }).notNull(),
-  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
-  roleId: uuid("role_id").references(() => roles.id),
-  status: varchar("status", { length: 20 }).notNull().default("active"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+export const invitation = pgTable(
+  "invitation",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    email: text("email").notNull(),
+    role: text("role").notNull(),
+    status: text("status").notNull().default("pending"),
+    expiresAt: timestamp("expires_at"),
+    createdAt: timestamp("created_at").notNull(),
+    inviterId: text("inviter_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+  },
+  (table) => [index("invitation_organization_id_idx").on(table.organizationId)]
+);

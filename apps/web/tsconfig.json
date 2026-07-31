@@ -11,6 +11,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "baseUrl": ".",
     "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
@@ -36,7 +37,9 @@
     "../../packages/shared/**/*.ts",
     "../../packages/domain/**/*.ts",
     "../../packages/application/**/*.ts",
-    "../../packages/infrastructure/**/*.ts"
+    "../../packages/infrastructure/**/*.ts",
+    "../../packages/ui/**/*.ts",
+    "../../packages/ui/**/*.tsx"
   ],
   "exclude": ["node_modules"]
 }

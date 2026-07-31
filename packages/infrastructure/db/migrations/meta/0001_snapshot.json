@@ -1,6 +1,6 @@
 {
-  "id": "dede626f-c601-49ae-8357-47de3a2d544a",
-  "prevId": "387c4f5c-aa89-408c-a0f1-a59984da26fe",
+  "id": "42de99f6-4abf-485e-8240-756525490800",
+  "prevId": "dc54f2a7-84f3-45ae-891d-c8744ab0aa8e",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -17,7 +17,7 @@
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -42,13 +42,13 @@
         },
         "requested_by": {
           "name": "requested_by",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "decided_by": {
           "name": "decided_by",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -87,10 +87,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "approval_requests_requested_by_organizations_id_fk": {
-          "name": "approval_requests_requested_by_organizations_id_fk",
+        "approval_requests_requested_by_user_id_fk": {
+          "name": "approval_requests_requested_by_user_id_fk",
           "tableFrom": "approval_requests",
-          "tableTo": "organizations",
+          "tableTo": "user",
           "columnsFrom": [
             "requested_by"
           ],
@@ -100,10 +100,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "approval_requests_decided_by_organizations_id_fk": {
-          "name": "approval_requests_decided_by_organizations_id_fk",
+        "approval_requests_decided_by_user_id_fk": {
+          "name": "approval_requests_decided_by_user_id_fk",
           "tableFrom": "approval_requests",
-          "tableTo": "organizations",
+          "tableTo": "user",
           "columnsFrom": [
             "decided_by"
           ],
@@ -133,7 +133,7 @@
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -158,7 +158,7 @@
         },
         "assigned_to": {
           "name": "assigned_to",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -225,59 +225,97 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.roles": {
-      "name": "roles",
+    "public.invitation": {
+      "name": "invitation",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(100)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "permissions": {
-          "name": "permissions",
-          "type": "jsonb",
+        "email": {
+          "name": "email",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'[]'::jsonb"
+          "notNull": true
         },
-        "is_system_default": {
-          "name": "is_system_default",
-          "type": "boolean",
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": false
+          "default": "'pending'"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
+        },
+        "inviter_id": {
+          "name": "inviter_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "invitation_organization_id_idx": {
+          "name": "invitation_organization_id_idx",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "roles_organization_id_organizations_id_fk": {
-          "name": "roles_organization_id_organizations_id_fk",
-          "tableFrom": "roles",
+        "invitation_organization_id_organizations_id_fk": {
+          "name": "invitation_organization_id_organizations_id_fk",
+          "tableFrom": "invitation",
           "tableTo": "organizations",
           "columnsFrom": [
             "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "invitation_inviter_id_user_id_fk": {
+          "name": "invitation_inviter_id_user_id_fk",
+          "tableFrom": "invitation",
+          "tableTo": "user",
+          "columnsFrom": [
+            "inviter_id"
           ],
           "columnsTo": [
             "id"
@@ -292,55 +330,78 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.user_org_memberships": {
-      "name": "user_org_memberships",
+    "public.member": {
+      "name": "member",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
           "notNull": true
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "role_id": {
-          "name": "role_id",
-          "type": "uuid",
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "status": {
-          "name": "status",
-          "type": "varchar(20)",
+        "role": {
+          "name": "role",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'active'"
+          "default": "'member'"
         },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "member_organization_id_idx": {
+          "name": "member_organization_id_idx",
+          "columns": [
+            {
+              "expression": "organization_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "member_user_id_idx": {
+          "name": "member_user_id_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "user_org_memberships_organization_id_organizations_id_fk": {
-          "name": "user_org_memberships_organization_id_organizations_id_fk",
-          "tableFrom": "user_org_memberships",
+        "member_organization_id_organizations_id_fk": {
+          "name": "member_organization_id_organizations_id_fk",
+          "tableFrom": "member",
           "tableTo": "organizations",
           "columnsFrom": [
             "organization_id"
@@ -351,17 +412,17 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "user_org_memberships_role_id_roles_id_fk": {
-          "name": "user_org_memberships_role_id_roles_id_fk",
-          "tableFrom": "user_org_memberships",
-          "tableTo": "roles",
+        "member_user_id_user_id_fk": {
+          "name": "member_user_id_user_id_fk",
+          "tableFrom": "member",
+          "tableTo": "user",
           "columnsFrom": [
-            "role_id"
+            "user_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -516,6 +577,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "active_organization_id": {
+          "name": "active_organization_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -529,7 +596,23 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "session_userId_idx": {
+          "name": "session_userId_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "session_user_id_user_id_fk": {
           "name": "session_user_id_user_id_fk",
@@ -656,6 +739,12 @@
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -679,7 +768,7 @@
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -783,13 +872,13 @@
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "recipient_user_id": {
           "name": "recipient_user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -860,10 +949,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -876,6 +964,12 @@
           "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true
+        },
+        "logo": {
+          "name": "logo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "status": {
           "name": "status",
@@ -890,6 +984,38 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'Asia/Jakarta'"
+        },
+        "team_name": {
+          "name": "team_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "industry": {
+          "name": "industry",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "company_size": {
+          "name": "company_size",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "preferences": {
+          "name": "preferences",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "notification_settings": {
+          "name": "notification_settings",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
         },
         "created_at": {
           "name": "created_at",
@@ -1013,7 +1139,7 @@
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -1119,7 +1245,7 @@
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -1235,7 +1361,7 @@
         },
         "resulting_transaction_id": {
           "name": "resulting_transaction_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         }
@@ -1301,7 +1427,7 @@
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -1320,13 +1446,13 @@
         },
         "created_by": {
           "name": "created_by",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "finalized_by": {
           "name": "finalized_by",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -1372,10 +1498,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "stock_opname_sessions_created_by_organizations_id_fk": {
-          "name": "stock_opname_sessions_created_by_organizations_id_fk",
+        "stock_opname_sessions_created_by_user_id_fk": {
+          "name": "stock_opname_sessions_created_by_user_id_fk",
           "tableFrom": "stock_opname_sessions",
-          "tableTo": "organizations",
+          "tableTo": "user",
           "columnsFrom": [
             "created_by"
           ],
@@ -1385,10 +1511,10 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "stock_opname_sessions_finalized_by_organizations_id_fk": {
-          "name": "stock_opname_sessions_finalized_by_organizations_id_fk",
+        "stock_opname_sessions_finalized_by_user_id_fk": {
+          "name": "stock_opname_sessions_finalized_by_user_id_fk",
           "tableFrom": "stock_opname_sessions",
-          "tableTo": "organizations",
+          "tableTo": "user",
           "columnsFrom": [
             "finalized_by"
           ],
@@ -1418,7 +1544,7 @@
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -1539,7 +1665,7 @@
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -1701,7 +1827,7 @@
         },
         "organization_id": {
           "name": "organization_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },

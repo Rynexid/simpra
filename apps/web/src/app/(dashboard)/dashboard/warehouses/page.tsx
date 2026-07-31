@@ -1,53 +1,27 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress, ProgressIndicator, ProgressTrack } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@simpra/ui/components/card";
+import { Badge } from "@simpra/ui/components/badge";
+import { Progress, ProgressIndicator, ProgressTrack } from "@simpra/ui/components/progress";
 import {
   WarehouseIcon,
   MapPinIcon,
-  LayersIcon,
   PlusIcon,
 } from "lucide-react";
+import { cookies } from "next/headers";
 
-const warehouses = [
-  {
-    name: "Main Warehouse",
-    code: "WH-MAIN",
-    location: "Jakarta Industrial Park, Block A",
-    zones: 6,
-    capacity: 85,
-    items: 1240,
-    status: "active" as const,
-  },
-  {
-    name: "West Distribution",
-    code: "WH-WEST",
-    location: "Tangerang Logistics Hub, Lot 12",
-    zones: 4,
-    capacity: 62,
-    items: 680,
-    status: "active" as const,
-  },
-  {
-    name: "East Storage",
-    code: "WH-EAST",
-    location: "Surabaya Industrial Estate, Unit 5",
-    zones: 3,
-    capacity: 45,
-    items: 320,
-    status: "active" as const,
-  },
-  {
-    name: "Overflow Facility",
-    code: "WH-OFLO",
-    location: "Bekasi Storage Park, Bay 7-9",
-    zones: 2,
-    capacity: 30,
-    items: 150,
-    status: "inactive" as const,
-  },
-];
+const API_BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
-export default function WarehousesPage() {
+export default async function WarehousesPage() {
+  const cookieStore = await cookies();
+  const res = await fetch(`${API_BASE}/api/v1/warehouses`, {
+    headers: { cookie: cookieStore.toString() },
+    cache: "no-store",
+  });
+
+  let warehouses = [];
+  if (res.ok) {
+    warehouses = await res.json();
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -64,53 +38,60 @@ export default function WarehousesPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {warehouses.map((wh) => (
-          <Card key={wh.code}>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <WarehouseIcon className="size-5" />
-                  </div>
-                  <div>
-                    <CardTitle>{wh.name}</CardTitle>
-                    <p className="text-xs text-muted-foreground font-mono mt-0.5">{wh.code}</p>
-                  </div>
-                </div>
-                <Badge variant={wh.status === "active" ? "default" : "secondary"} className={wh.status === "active" ? "" : "capitalize"}>
-                  {wh.status}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPinIcon className="size-3.5 shrink-0" />
-                <span className="truncate">{wh.location}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <LayersIcon className="size-3.5 shrink-0" />
-                <span>{wh.zones} zones</span>
-              </div>
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Capacity</span>
-                  <span className="font-medium">{wh.capacity}%</span>
-                </div>
-                <Progress value={wh.capacity}>
-                  <ProgressTrack className="h-2">
-                    <ProgressIndicator
-                      className={wh.capacity > 80 ? "bg-warning" : wh.capacity > 50 ? "bg-primary" : "bg-success"}
-                    />
-                  </ProgressTrack>
-                </Progress>
-              </div>
-              <div className="text-sm">
-                <span className="text-muted-foreground">Items stored: </span>
-                <span className="font-medium">{wh.items.toLocaleString()}</span>
-              </div>
+        {warehouses.length === 0 ? (
+          <Card>
+            <CardContent className="py-8 text-center text-muted-foreground">
+              No warehouses yet. Create your first warehouse to get started.
             </CardContent>
           </Card>
-        ))}
+        ) : (
+          warehouses.map((wh: {
+            id: string;
+            name: string;
+            code: string;
+            address: string | null;
+            capacity: number | null;
+            isActive: boolean;
+          }) => (
+            <Card key={wh.id}>
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <WarehouseIcon className="size-5" />
+                    </div>
+                    <div>
+                      <CardTitle>{wh.name}</CardTitle>
+                      <p className="text-xs text-muted-foreground font-mono mt-0.5">{wh.code}</p>
+                    </div>
+                  </div>
+                  <Badge variant={wh.isActive ? "default" : "secondary"} className={wh.isActive ? "" : "capitalize"}>
+                    {wh.isActive ? "Active" : "Inactive"}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <MapPinIcon className="size-3.5 shrink-0" />
+                  <span className="truncate">{wh.address ?? "No address"}</span>
+                </div>
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Capacity</span>
+                    <span className="font-medium">{wh.capacity ?? 0}%</span>
+                  </div>
+                  <Progress value={wh.capacity ?? 0}>
+                    <ProgressTrack className="h-2">
+                      <ProgressIndicator
+                        className={(wh.capacity ?? 0) > 80 ? "bg-warning" : (wh.capacity ?? 0) > 50 ? "bg-primary" : "bg-success"}
+                      />
+                    </ProgressTrack>
+                  </Progress>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
     </div>
   );

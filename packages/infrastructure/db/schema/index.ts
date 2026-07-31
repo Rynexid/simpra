@@ -1,5 +1,5 @@
 import { organizations } from "./organizations";
-import { roles, userOrgMemberships } from "./auth";
+import { member, invitation } from "./auth";
 import { inventoryItems } from "./inventory";
 import { warehouses, warehouseZones } from "./warehouses";
 import { stockTransactions } from "./stock-transactions";
@@ -14,8 +14,8 @@ import { user, session, account, verification } from "./better-auth";
 
 export {
   organizations,
-  roles,
-  userOrgMemberships,
+  member,
+  invitation,
   inventoryItems,
   warehouses,
   warehouseZones,

@@ -1,6 +1,6 @@
 "use client";
 
-import { CommandDialog } from "@/components/ui/command";
+import { CommandDialog } from "@simpra/ui/components/command";
 import {
   HomeIcon,
   ShoppingCartIcon,

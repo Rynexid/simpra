@@ -4,7 +4,7 @@ import { user } from "./better-auth";
 
 export const approvalRequests = pgTable("approval_requests", {
   id: uuid("id").primaryKey().defaultRandom(),
-  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   entityType: varchar("entity_type", { length: 100 }).notNull(),
   entityId: uuid("entity_id").notNull(),
   status: varchar("status", { length: 20 }).notNull().default("pending"),

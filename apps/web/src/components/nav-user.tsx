@@ -5,7 +5,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "@/components/ui/avatar"
+} from "@simpra/ui/components/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,13 +14,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@simpra/ui/components/dropdown-menu"
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from "@simpra/ui/components/sidebar"
 import {
   ChevronsUpDownIcon,
   SparklesIcon,

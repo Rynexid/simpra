@@ -5,7 +5,7 @@ import { inventoryItems } from "./inventory";
 
 export const purchaseOrders = pgTable("purchase_orders", {
   id: uuid("id").primaryKey().defaultRandom(),
-  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   supplierId: uuid("supplier_id").notNull().references(() => suppliers.id, { onDelete: "cascade" }),
   orderNumber: varchar("order_number", { length: 50 }).notNull().unique(),
   status: varchar("status", { length: 20 }).notNull().default("draft"),

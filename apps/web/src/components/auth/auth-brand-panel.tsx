@@ -1,4 +1,6 @@
-import { Package, Warehouse, ShoppingCart, BarChart3, Shield } from "lucide-react"
+import Link from "next/link";
+import Image from "next/image";
+import { AuthDataPanel } from "@/components/auth/auth-data-panel"
 
 export function AuthBrandPanel() {
   return (
@@ -17,41 +19,15 @@ export function AuthBrandPanel() {
 
       <div className="flex flex-col justify-between w-full p-12">
         <div>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <span className="text-sm font-bold">S</span>
-            </div>
-            <span className="text-xl font-semibold">Simpra</span>
-          </div>
+          <Link href="/" className="flex items-center">
+            <Image src="/simpraLogo.webp" alt="Simpra" width={120} height={40} className="h-10 w-auto" />
+            <span className="ml-3 text-xl font-semibold">Simpra</span>
+          </Link>
         </div>
 
-        <div className="max-w-md">
-          <h2 className="text-3xl font-bold tracking-tight leading-[1.1]">
-            Inventory & Warehouse,
-            <br />
-            <span className="text-primary">finally simple.</span>
-          </h2>
-          <p className="mt-4 text-muted-foreground leading-relaxed">
-            Stop losing stock to spreadsheets. Manage inventory, warehouses,
-            suppliers, and purchasing from one platform built for speed.
-          </p>
-
-          <div className="mt-10 grid grid-cols-2 gap-4">
-            {[
-              { icon: Package, label: "12K+ SKUs" },
-              { icon: Warehouse, label: "Multi-Warehouse" },
-              { icon: ShoppingCart, label: "Auto PO Receipt" },
-              { icon: BarChart3, label: "Real-time Analytics" },
-              { icon: Shield, label: "Audit Trail" },
-              { icon: BarChart3, label: "Barcode Scanning" },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-3 border border-border bg-card/50 p-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center border border-border bg-background">
-                  <item.icon className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-xs font-medium">{item.label}</span>
-              </div>
-            ))}
+        <div className="w-full">
+          <div className="rounded-lg border border-border bg-background/50 p-4">
+            <AuthDataPanel />
           </div>
         </div>
 

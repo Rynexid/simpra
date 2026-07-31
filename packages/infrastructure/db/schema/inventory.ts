@@ -1,9 +1,9 @@
-import { pgTable, uuid, varchar, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
 import { organizations } from "./organizations";
 
 export const inventoryItems = pgTable("inventory_items", {
   id: uuid("id").primaryKey().defaultRandom(),
-  organizationId: uuid("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  organizationId: text("organization_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   sku: varchar("sku", { length: 100 }).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   category: varchar("category", { length: 100 }),

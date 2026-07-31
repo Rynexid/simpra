@@ -1,0 +1,1 @@
+ALTER TABLE "organizations" ADD COLUMN "currency" varchar(3) DEFAULT 'IDR' NOT NULL;

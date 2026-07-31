@@ -1,34 +1,64 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Progress, ProgressIndicator, ProgressTrack } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@simpra/ui/components/card";
+import { Progress, ProgressIndicator, ProgressTrack } from "@simpra/ui/components/progress";
 import {
   TrendingUpIcon,
   TrendingDownIcon,
+  Loader2Icon,
 } from "lucide-react";
 
-const kpis = [
-  { label: "Inventory Turnover", value: "4.2", change: "+0.8", trend: "up", period: "vs last quarter" },
-  { label: "Stock Accuracy", value: "97.3%", change: "+1.2%", trend: "up", period: "vs last month" },
-  { label: "Avg Order Fulfillment", value: "2.4 days", change: "-0.3", trend: "down", period: "vs last month" },
-  { label: "Warehouse Utilization", value: "72%", change: "+5%", trend: "up", period: "vs last quarter" },
-];
+async function getKPIData() {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/v1/analytics/kpi`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch KPI data");
+  return res.json();
+}
 
-const topCategories = [
-  { name: "Electronics", value: 35, revenue: "$42,000", trend: "up" },
-  { name: "Hardware", value: 25, revenue: "$28,500", trend: "up" },
-  { name: "Raw Materials", value: 20, revenue: "$18,200", trend: "down" },
-  { name: "Seals & Gaskets", value: 12, revenue: "$9,800", trend: "up" },
-  { name: "Packaging", value: 8, revenue: "$5,400", trend: "down" },
-];
+async function getCategoryData() {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/v1/analytics/categories`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch category data");
+  return res.json();
+}
 
-const monthlyTrends = [
-  { month: "Nov", in: 12, out: 10 },
-  { month: "Dec", in: 15, out: 13 },
-  { month: "Jan", in: 18, out: 14 },
-  { month: "Feb", in: 14, out: 16 },
-  { month: "Mar", in: 20, out: 12 },
-];
+async function getTrendData() {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/v1/analytics/trends?months=5`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch trend data");
+  return res.json();
+}
 
-export default function AnalyticsPage() {
+export default async function AnalyticsPage() {
+  const [kpiData, categoryData, trendData] = await Promise.all([
+    getKPIData().catch(() => null),
+    getCategoryData().catch(() => []),
+    getTrendData().catch(() => []),
+  ]);
+
+  const kpis = kpiData
+    ? [
+        { label: "Inventory Turnover", value: kpiData.inventoryTurnover.value.toFixed(1), change: "current", trend: "up" as const, period: "current period" },
+        { label: "Stock Accuracy", value: `${kpiData.stockAccuracy.value}%`, change: `${kpiData.stockAccuracy.positiveAdjustments}/${kpiData.stockAccuracy.totalTransactions}`, trend: kpiData.stockAccuracy.value >= 95 ? "up" : "down", period: "all transactions" },
+        { label: "Warehouse Utilization", value: `${kpiData.warehouseUtilization.utilizationPercentage}%`, change: `${kpiData.warehouseUtilization.totalStock}/${kpiData.warehouseUtilization.totalCapacity}`, trend: kpiData.warehouseUtilization.utilizationPercentage >= 70 ? "up" : "down", period: "total capacity" },
+      ]
+    : [
+        { label: "Inventory Turnover", value: "--", change: "--", trend: "up" as const, period: "no data" },
+        { label: "Stock Accuracy", value: "--", change: "--", trend: "up" as const, period: "no data" },
+        { label: "Warehouse Utilization", value: "--", change: "--", trend: "up" as const, period: "no data" },
+      ];
+
+  const topCategories = (categoryData as { category: string; count: number; percentage: number }[]).map((cat) => ({
+    name: cat.category,
+    value: Math.round(cat.percentage),
+    revenue: `${cat.count} items`,
+    trend: "up" as const,
+  }));
+
+  const monthlyTrends = (trendData as { month: string; stockIn: number; stockOut: number }[]).map((m) => ({
+    month: m.month.slice(5),
+    in: m.stockIn,
+    out: m.stockOut,
+  }));
+
   return (
     <div className="space-y-6">
       <div>
@@ -66,36 +96,42 @@ export default function AnalyticsPage() {
             <CardDescription>Monthly stock-in vs stock-out volume</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-end gap-3 h-40">
-              {monthlyTrends.map((month) => {
-                const maxVal = Math.max(...monthlyTrends.flatMap(m => [m.in, m.out]));
-                return (
-                  <div key={month.month} className="flex flex-1 flex-col items-center gap-1">
-                    <div className="flex w-full items-end justify-center gap-0.5">
-                      <div
-                        className="w-3 rounded-t bg-success/80 transition-all"
-                        style={{ height: `${(month.in / maxVal) * 100}%` }}
-                      />
-                      <div
-                        className="w-3 rounded-t bg-destructive/60 transition-all"
-                        style={{ height: `${(month.out / maxVal) * 100}%` }}
-                      />
-                    </div>
-                    <span className="text-xs text-muted-foreground">{month.month}</span>
+            {monthlyTrends.length === 0 ? (
+              <div className="flex h-40 items-center justify-center text-muted-foreground text-sm">No trend data available</div>
+            ) : (
+              <>
+                <div className="flex items-end gap-3 h-40">
+                  {monthlyTrends.map((month) => {
+                    const maxVal = Math.max(...monthlyTrends.flatMap((m) => [m.in, m.out]), 1);
+                    return (
+                      <div key={month.month} className="flex flex-1 flex-col items-center gap-1">
+                        <div className="flex w-full items-end justify-center gap-0.5">
+                          <div
+                            className="w-3 rounded-t bg-success/80 transition-all"
+                            style={{ height: `${(month.in / maxVal) * 100}%` }}
+                          />
+                          <div
+                            className="w-3 rounded-t bg-destructive/60 transition-all"
+                            style={{ height: `${(month.out / maxVal) * 100}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-muted-foreground">{month.month}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-4 flex justify-center gap-4 text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <span className="size-2.5 rounded-sm bg-success/80" />
+                    <span className="text-muted-foreground">Stock In</span>
                   </div>
-                );
-              })}
-            </div>
-            <div className="mt-4 flex justify-center gap-4 text-xs">
-              <div className="flex items-center gap-1.5">
-                <span className="size-2.5 rounded-sm bg-success/80" />
-                <span className="text-muted-foreground">Stock In</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="size-2.5 rounded-sm bg-destructive/60" />
-                <span className="text-muted-foreground">Stock Out</span>
-              </div>
-            </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="size-2.5 rounded-sm bg-destructive/60" />
+                    <span className="text-muted-foreground">Stock Out</span>
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -105,26 +141,30 @@ export default function AnalyticsPage() {
             <CardDescription>Distribution of items across categories</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {topCategories.map((cat) => (
-              <div key={cat.name}>
-                <div className="flex items-center justify-between text-sm mb-1.5">
-                  <span className="font-medium">{cat.name}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">{cat.revenue}</span>
-                    {cat.trend === "up"
-                      ? <TrendingUpIcon className="size-3 text-success" />
-                      : <TrendingDownIcon className="size-3 text-destructive" />
-                    }
+            {topCategories.length === 0 ? (
+              <div className="flex h-32 items-center justify-center text-muted-foreground text-sm">No category data available</div>
+            ) : (
+              topCategories.map((cat) => (
+                <div key={cat.name}>
+                  <div className="flex items-center justify-between text-sm mb-1.5">
+                    <span className="font-medium">{cat.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground">{cat.revenue}</span>
+                      {cat.trend === "up"
+                        ? <TrendingUpIcon className="size-3 text-success" />
+                        : <TrendingDownIcon className="size-3 text-destructive" />
+                      }
+                    </div>
                   </div>
+                  <Progress value={cat.value}>
+                    <ProgressTrack className="h-2">
+                      <ProgressIndicator className={cat.trend === "up" ? "bg-success" : "bg-warning"} />
+                    </ProgressTrack>
+                  </Progress>
+                  <div className="mt-0.5 text-xs text-muted-foreground">{cat.value}% of total items</div>
                 </div>
-                <Progress value={cat.value}>
-                  <ProgressTrack className="h-2">
-                    <ProgressIndicator className={cat.trend === "up" ? "bg-success" : "bg-warning"} />
-                  </ProgressTrack>
-                </Progress>
-                <div className="mt-0.5 text-xs text-muted-foreground">{cat.value}% of total items</div>
-              </div>
-            ))}
+              ))
+            )}
           </CardContent>
         </Card>
       </div>
