@@ -17,7 +17,6 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "api:dev": "bun run --cwd apps/api dev",
     "docs:dev": "vitepress dev apps/docs",
     "docs:build": "vitepress build apps/docs",
     "docs:preview": "vitepress preview apps/docs"
@@ -28,7 +27,8 @@
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitepress": "^1.6.4"
   },
   "dependencies": {
     "better-auth": "^1.6.25",
