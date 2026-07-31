@@ -6,7 +6,7 @@ interface RequestConfig {
 }
 
 let config: RequestConfig = {
-  baseUrl: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001",
+  baseUrl: process.env.NEXT_PUBLIC_API_URL ?? "",
 };
 
 export function configureApi(newConfig: Partial<RequestConfig>) {
