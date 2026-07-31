@@ -1,1 +1,0 @@
-import{_ as a,o as t,c as i,a0 as r}from"./chunks/framework.Bmhw_dvp.js";const u=JSON.parse('{"title":"Simpra Docs","description":"","frontmatter":{},"headers":[],"relativePath":"index.md","filePath":"index.md"}'),o={name:"index.md"};function n(s,e,c,l,d,p){return t(),i("div",null,[...e[0]||(e[0]=[r("",6)])])}const m=a(o,[["render",n]]);export{u as __pageData,m as default};

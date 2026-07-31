@@ -5,6 +5,9 @@ export default defineConfig({
   description: 'Modern Inventory & Warehouse Platform — documentation',
   base: '/',
   lang: 'en-US',
+  build: {
+    outDir: '../dist'
+  },
   themeConfig: {
     nav: [
       { text: 'Guide', link: '/guide/' },
