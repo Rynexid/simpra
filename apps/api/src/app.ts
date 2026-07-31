@@ -50,16 +50,13 @@ app.all("/auth/*", async (c) => {
 
   const request = new Request(url.toString(), {
     method: c.req.method,
-    headers: c.req.headers(),
-    body: await c.req.text(),
+    headers: c.req.headers,
+    body: c.req.body,
     redirect: "manual",
   });
 
   const response = await auth.handler(request);
-  return new Response(response.body, {
-    status: response.status,
-    headers: Object.fromEntries(response.headers.entries()),
-  });
+  return response;
 });
 
 export default app;
