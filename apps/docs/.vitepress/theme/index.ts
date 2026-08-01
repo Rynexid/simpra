@@ -1,9 +1,4 @@
+import DefaultTheme from 'vitepress/theme'
 import './tailwind.css'
-import Layout from './Layout.vue'
 
-export default {
-  Layout,
-  enhanceApp({ app }) {
-    // app.component('MyComponent', MyComponent)
-  },
-}
+export default DefaultTheme
