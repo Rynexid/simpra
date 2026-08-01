@@ -1,17 +1,11 @@
 import { defineConfig } from 'vitepress'
 import tailwindcss from '@tailwindcss/vite'
-import path from 'node:path'
-
-const __dirname = path.dirname(new URL(import.meta.url).pathname)
 
 export default defineConfig({
   title: 'Simpra Docs',
   description: 'Modern Inventory & Warehouse Platform — documentation',
   base: '/',
   lang: 'en-US',
-  build: {
-    outDir: path.resolve(__dirname, '../dist')
-  },
   vite: {
     plugins: [tailwindcss()]
   },
